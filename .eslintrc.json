@@ -223,7 +223,7 @@
     "operator-assignment": 0,
     "operator-linebreak": [1, "before"],
     "quote-props": [1, "as-needed"],
-    "quotes": [1, "single", { "allowTemplateLiterals": true }],
+    "quotes": [1, "double", { "allowTemplateLiterals": true }],
     "require-jsdoc": [
       0,
       {
