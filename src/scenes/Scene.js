@@ -31,12 +31,12 @@ export default class Scene extends Container {
    * Define the assets used by this scene, so they can be loaded
    * and used by all subsequent scenes
    */
-  async preload({ images, sounds } = {}) {
+  async preload(assets = {}) {
     // note that we don't use Promise.all here
     // since images have to be loaded over the network first
     // and then uploaded to the gpu
-    return Assets.load({ images, sounds }, this.onLoadProgress.bind(this)).then(
-      () => Assets.prepareImages(images)
+    return Assets.load(assets, this.onLoadProgress.bind(this)).then(() =>
+      Assets.prepareImages(assets.images)
     );
   }
 
