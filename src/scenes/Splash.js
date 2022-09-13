@@ -30,7 +30,7 @@ export default class Splash extends Scene {
     };
     const sounds = {};
 
-    return super.preload({ images, sounds });
+    return super.preload({ images, sounds, fonts: Assets.fonts });
   }
 
   onResize(width, height) {

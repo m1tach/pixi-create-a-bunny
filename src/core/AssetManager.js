@@ -3,14 +3,11 @@ import { Loader, Spritesheet, Texture } from "pixi.js";
 import { Howl } from "howler";
 import config from "../config";
 
-const context = require.context(
-  "../assets",
-  true,
-  /\.(jpg|png|wav|m4a|ogg|mp3)$/im
-);
+const context = require.context("../assets", true);
 
 const IMG_EXTENSIONS = ["jpeg", "jpg", "png"];
 const SOUND_EXTENSIONS = ["wav", "ogg", "m4a", "mp3"];
+const FONT_EXTENSIONS = ["xml", "fnt"];
 
 /**
  * Global asset manager to help streamline asset usage in your game.
@@ -25,6 +22,7 @@ class AssetManager {
     this._assets = {};
     this._sounds = {};
     this._images = {};
+    this._fonts = {};
     this._spritesheets = {};
 
     this._importAssets();
@@ -44,19 +42,20 @@ class AssetManager {
    *
    * @type {Object} options.images id-url object map of the images to be loaded
    * @type {Object} options.sounds id-url object map of the sounds to be loaded
-   * @type {Object} options.sounds id-url object map of the sounds to be loaded
+   * @type {Object} options.fonts id-url object map of the fonts to be loaded
    * @type {Function} progressCallback Progress callback function, called every time a single asset is loaded
    *
    * @return {Promise} Returns a promise that is resolved once all assets are loaded
    */
   load(
-    assets = { images: this._images, sounds: this._sounds },
+    assets = { images: this._images, sounds: this._sounds, fonts: this._fonts },
     progressCallback = () => {}
   ) {
-    const { images, sounds } = assets;
+    const { images, sounds, fonts } = assets;
     const assetTypesCount = Object.keys(assets).length;
     const imagesCount = images ? Object.keys(images).length : 0;
     const soundsCount = sounds ? Object.keys(sounds).length : 0;
+    const fontsCount = fonts ? Object.keys(fonts).length : 0;
     const loadPromises = [];
     let loadProgress = 0;
 
@@ -67,12 +66,16 @@ class AssetManager {
 
     if (imagesCount) {
       loadPromises.push(
-        this.loadImages(images, () => calcTotalProgress(100 / imagesCount))
+        this.loadAssets(images, () => calcTotalProgress(100 / imagesCount))
       );
     }
 
     if (soundsCount) {
       loadPromises.push(this.loadSounds(sounds, calcTotalProgress));
+    }
+
+    if (fontsCount) {
+      loadPromises.push(this.loadAssets(fonts, calcTotalProgress));
     }
 
     return Promise.all(loadPromises);
@@ -83,7 +86,7 @@ class AssetManager {
    *
    * @return {Promise} Resolved when the assets files are downloaded and parsed into texture objects
    */
-  loadImages(images = {}, progressCallback = () => {}) {
+  loadAssets(images = {}, progressCallback = () => {}) {
     const loader = new Loader(config.root);
 
     for (const [img, url] of Object.entries(images)) {
@@ -162,6 +165,13 @@ class AssetManager {
   }
 
   /**
+   * Manifest of all available fonts
+   */
+  get fonts() {
+    return this._fonts;
+  }
+
+  /**
    * Manifest of all available assets
    */
   get assets() {
@@ -203,6 +213,10 @@ class AssetManager {
 
       if (SOUND_EXTENSIONS.indexOf(ext) > -1) {
         this._sounds[id] = url;
+      }
+
+      if (FONT_EXTENSIONS.indexOf(ext) > -1) {
+        this._fonts[id] = url;
       }
     });
   }
