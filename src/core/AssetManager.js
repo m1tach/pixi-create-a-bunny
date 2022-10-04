@@ -8,6 +8,7 @@ const context = require.context("../assets", true);
 const IMG_EXTENSIONS = ["jpeg", "jpg", "png"];
 const SOUND_EXTENSIONS = ["wav", "ogg", "m4a", "mp3"];
 const FONT_EXTENSIONS = ["xml", "fnt"];
+const SPRITESHEET_EXTENSIONS = ["json"];
 
 /**
  * Global asset manager to help streamline asset usage in your game.
@@ -48,14 +49,22 @@ class AssetManager {
    * @return {Promise} Returns a promise that is resolved once all assets are loaded
    */
   load(
-    assets = { images: this._images, sounds: this._sounds, fonts: this._fonts },
+    assets = {
+      images: this._images,
+      sounds: this._sounds,
+      fonts: this._fonts,
+      spritesheets: this._spritesheets,
+    },
     progressCallback = () => {}
   ) {
-    const { images, sounds, fonts } = assets;
+    const { images, sounds, fonts, spritesheets } = assets;
     const assetTypesCount = Object.keys(assets).length;
     const imagesCount = images ? Object.keys(images).length : 0;
     const soundsCount = sounds ? Object.keys(sounds).length : 0;
     const fontsCount = fonts ? Object.keys(fonts).length : 0;
+    const spritesheetsCount = spritesheets
+      ? Object.keys(spritesheets).length
+      : 0;
     const loadPromises = [];
     let loadProgress = 0;
 
@@ -76,6 +85,10 @@ class AssetManager {
 
     if (fontsCount) {
       loadPromises.push(this.loadAssets(fonts, calcTotalProgress));
+    }
+
+    if (spritesheetsCount) {
+      loadPromises.push(this.loadSpritesheets(spritesheets, calcTotalProgress));
     }
 
     return Promise.all(loadPromises);
@@ -133,21 +146,29 @@ class AssetManager {
   }
 
   /**
-   * Creates spritesheets for animations and other purposes
-   * @param {<Array.{ image: String, data: Object }>} list
+   * Load a spritesheet from json files
    */
-  prepareSpritesheets(list) {
-    const promises = list.map((item) => {
-      return new Promise((resolve) => {
-        const sheet = new Spritesheet(Texture.from(item.texture), item.data);
-        sheet.parse(() => {
-          this._spritesheets[item.texture] = sheet;
-          resolve(sheet);
-        });
+  loadSpritesheets(spritesheets = {}, progressCallback = () => {}) {
+    const loader = new Loader();
+
+    for (const [id, data] of Object.entries(spritesheets)) {
+      loader.add(id, data.meta.image);
+    }
+
+    loader.onProgress.add((loader, resource) => {
+      const spritesheet = new Spritesheet(
+        resource.texture,
+        spritesheets[resource.name]
+      );
+
+      this._spritesheets[resource.name] = spritesheet;
+
+      spritesheet.parse(() => {
+        progressCallback(loader.progress);
       });
     });
 
-    return Promise.all(promises);
+    return new Promise(loader.load.bind(loader));
   }
 
   /**
@@ -217,6 +238,12 @@ class AssetManager {
 
       if (FONT_EXTENSIONS.indexOf(ext) > -1) {
         this._fonts[id] = url;
+      }
+
+      if (SPRITESHEET_EXTENSIONS.indexOf(ext) > -1) {
+        this._spritesheets[id] = url;
+
+        return;
       }
     });
   }
