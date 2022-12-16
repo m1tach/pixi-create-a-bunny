@@ -3,7 +3,7 @@ import { Loader, Spritesheet, Texture } from "pixi.js";
 import { Howl } from "howler";
 import config from "../config";
 
-const context = require.context("../assets", true);
+const assets = import.meta.glob("/src/assets/**/*.*");
 
 const IMG_EXTENSIONS = ["jpeg", "jpg", "png"];
 const SOUND_EXTENSIONS = ["wav", "ogg", "m4a", "mp3"];
@@ -221,11 +221,11 @@ class AssetManager {
    * @private
    */
   _importAssets() {
-    context.keys().forEach((filename) => {
-      let [, id, ext] = filename.split("."); // eslint-disable-line prefer-const
-      const url = context(filename);
+    Object.entries(assets).forEach(async ([filename, asset]) => {
+      let [id, ext] = filename.split("."); // eslint-disable-line prefer-const
 
-      id = id.substring(1);
+      id = id.replace("/src/assets/", "");
+      const url = filename.replace("src/assets/", "");
       this._assets[id] = url;
 
       if (IMG_EXTENSIONS.indexOf(ext) > -1) {
