@@ -10,7 +10,7 @@ export default class Play extends Scene {
     this.addChild(footer);
 
     const text = new BitmapText("Hello, PIXI", {
-      font: "Desyrel",
+      fontName: "Desyrel",
     });
 
     text.anchor.set(0.5);
