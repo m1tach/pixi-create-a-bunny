@@ -15,9 +15,7 @@ export default class Play extends Scene {
 
     // text.anchor.set(0.5);
 
-    const bunny = PIXI.Sprite.from('/bunny.png');
-    bunny.anchor.set(0.5);
-    this.addChild(bunny);
+
 
     // this.addChild(text);
   }

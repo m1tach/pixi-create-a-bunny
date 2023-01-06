@@ -10,7 +10,10 @@ if (process.env.NODE_ENV === "development") {
 document.addEventListener("DOMContentLoaded", () => {
   const app = new Application();
   
-
+  const bunny = PIXI.Sprite.from('/bunny.png');
+  bunny.anchor.set(0.5);
+  bunny.position.set(app.view.width / 2, app.view.height / 2);
+  app.stage.addChild(bunny);
 
   // Used for automated testing only
   if (process.env.NODE_ENV === "development") {
