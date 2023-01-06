@@ -9,13 +9,17 @@ export default class Play extends Scene {
     footer.y = window.innerHeight / 2 - footer.height;
     this.addChild(footer);
 
-    const text = new BitmapText("Hello, PIXI", {
-      fontName: "Desyrel",
-    });
+    // const text = new BitmapText("Hello, PIXI", {
+    //   fontName: "Desyrel",
+    // });
 
-    text.anchor.set(0.5);
+    // text.anchor.set(0.5);
 
-    this.addChild(text);
+    const bunny = PIXI.Sprite.from('/bunny.png');
+    bunny.anchor.set(0.5);
+    this.addChild(bunny);
+
+    // this.addChild(text);
   }
 
   /**
