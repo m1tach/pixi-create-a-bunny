@@ -1,6 +1,7 @@
 import Footer from "../components/Footer";
 import Scene from "./Scene";
 import { BitmapText } from "pixi.js";
+import Bunny from "../components/Bunny";
 
 export default class Play extends Scene {
   async onCreated() {
@@ -9,15 +10,8 @@ export default class Play extends Scene {
     footer.y = window.innerHeight / 2 - footer.height;
     this.addChild(footer);
 
-    // const text = new BitmapText("Hello, PIXI", {
-    //   fontName: "Desyrel",
-    // });
-
-    // text.anchor.set(0.5);
-
-
-
-    // this.addChild(text);
+    const bunny = new Bunny();
+    this.addChild(bunny)
   }
 
   /**
